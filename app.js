@@ -9,7 +9,7 @@ var qiniu = require("qiniu");
 
 info = require('./models/info');
 
-mongoose.connect('mongodb://localhost:30000/info');
+mongoose.connect('mongodb://admin:smghd1376@localhost:30000/info');
 var db=mongoose.connection;
 
 //将public目录下的所有内容作为可静态访问和下载的内容
@@ -51,28 +51,26 @@ app.get('/qb',function(req,res){
             json:true
         };
         rp(options).then(function(data){
-            console.log(data);
+            
             var arr = new Array();
-            arr = data.result;
-            //console.log(arr);
-            //将取到的数据写入info数据库中，标记为未处理
-            console.log("----------------------------");
-            console.log(arr[0]);
-            for (var o=0;o<arr.length;o++){
-                var infoObject = new Object();
-                infoObject.id = arr[o].id;
-                infoObject.subsysid = subsysid;
-                infoObject.title = arr[o].title;
-                infoObject.createtime = arr[o].createtime;
-                infoObject.isDone = "0";
+	    arr = data.result;
+            //console.log(data);
+	    //将取到的数据写入info数据库中，标记为未处理
+                for (var o=0;o<arr.length;o++){
+                    var infoObject = new Object();
+                    infoObject.id = arr[o].id;
+                    infoObject.subsysid = subsysid;
+                    infoObject.title = arr[o].title;
+                    infoObject.createtime = arr[o].createtime;
+                    infoObject.isDone = "0";
 
-                info.addInfo(infoObject,function(err,infoObject){
-                    if (err){
-                        throw err;
-                    }
-                    res.json(infoObject);
-                });
-            }
+                    info.addInfo(infoObject,function(err,infoObject){
+                        if (err){
+                            throw err;
+                        }
+                        res.json(infoObject);
+                    });
+                }
         });
     }
     
@@ -256,7 +254,7 @@ app.get('/upload',function(req,res){
                                 m_duration = parseInt(materials[m].details.duration)*1000;
                             }
                             
-                            //getTokenAndUpload(filename,path);
+                            getTokenAndUpload(filename,path);
                         }
                     }
 
@@ -287,35 +285,39 @@ app.get('/upload',function(req,res){
                 //objectjson.Content = dingdongContent;
                 //console.log(dingdongContent);
                 dingdongContent = dingdongContent.replace(/\n/g,"");
-                dingdongContent = dingdongContent.replace(/<span class="s1">/g,"");
+                //dingdongContent = dingdongContent.replace(/<span class="s1">/g,"");
                 dingdongContent = dingdongContent.replace(/<\/span>/g,"");
-                dingdongContent = dingdongContent.replace(/<span dir="auto" class="s1">/g,"");
-                dingdongContent = dingdongContent.replace(/<span class="s2">/g,"");
-                dingdongContent = dingdongContent.replace(/<span>      /g,"");
-                dingdongContent = dingdongContent.replace(/<span class="s3">/g,"");
-                dingdongContent = dingdongContent.replace(/ class="p1"/g,"");
-                dingdongContent = dingdongContent.replace(/ class="p2"/g,"");
-                dingdongContent = dingdongContent.replace(/ class="p3"/g,"");
-                dingdongContent = dingdongContent.replace(/ dir="auto"/g,"");
+                //dingdongContent = dingdongContent.replace(/<span dir="auto" class="s1">/g,"");
+                //dingdongContent = dingdongContent.replace(/<span class="s2">/g,"");
+                //dingdongContent = dingdongContent.replace(/<span>      /g,"");
+                //dingdongContent = dingdongContent.replace(/<span class="s3">/g,"");
+                //dingdongContent = dingdongContent.replace(/<span class="s4">/g,"");
+                //dingdongContent = dingdongContent.replace(/ class="p1"/g,"");
+                //dingdongContent = dingdongContent.replace(/ class="p2"/g,"");
+                //dingdongContent = dingdongContent.replace(/ class="p3"/g,"");
+                //dingdongContent = dingdongContent.replace(/ dir="auto"/g,"");
 
-                dingdongContent = dingdongContent.replace(/ style="-qt-paragraph-type:empty;/g,"");
-                dingdongContent = dingdongContent.replace(/ margin-top:0px;/g,"");
-                dingdongContent = dingdongContent.replace(/ margin-bottom:0px;/g,"");
-                dingdongContent = dingdongContent.replace(/ margin-left:0px;/g,"");
-                dingdongContent = dingdongContent.replace(/ margin-right:0px;/g,"");
+                //dingdongContent = dingdongContent.replace(/ style="-qt-paragraph-type:empty;/g,"");
+                //dingdongContent = dingdongContent.replace(/ margin-top:0px;/g,"");
+                //dingdongContent = dingdongContent.replace(/ margin-bottom:0px;/g,"");
+                //dingdongContent = dingdongContent.replace(/ margin-left:0px;/g,"");
+                //dingdongContent = dingdongContent.replace(/ margin-right:0px;/g,"");
 
-                dingdongContent = dingdongContent.replace(/ -qt-block-indent:0;/g,"");
-                dingdongContent = dingdongContent.replace(/ text-indent:0px;"/g,"");
-                dingdongContent = dingdongContent.replace(/ style="/g,"");
-
+                //dingdongContent = dingdongContent.replace(/ -qt-block-indent:0;/g,"");
+                //dingdongContent = dingdongContent.replace(/ text-indent:0px;"/g,"");
+                //dingdongContent = dingdongContent.replace(/ style="/g,"");
+		
+		        dingdongContent = dingdongContent.replace(/<span[^>]*>/g,"");
+    		    dingdongContent = dingdongContent.replace(/<p[^>]*>/g,"<p>");
+    		    dingdongContent = dingdongContent.replace(/<body[^>]*>/g,"<body>");
                 
                 objectjson.Content = dingdongContent;
                 //objectjson.Content = "在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话在市委十一届一次全会结束时的讲话";
                 //objectjson.Content = "The simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by BluebirdThe simplified HTTP request client 'request' with Promise support. Powered by Bluebird";
                 //console.log(dingdongContent);
-                //console.log(objectjson);
+                console.log(objectjson);
                 //CreateNews(JSON.stringify(objectjson));
-             //   CreateNews(JSON.stringify(objectjson));
+                CreateNews(JSON.stringify(objectjson));
                 //console.log(JSON.stringify(objectjson));
             });
     }
